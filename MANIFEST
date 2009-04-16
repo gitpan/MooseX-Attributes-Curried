@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Attributes/Curried.pm
+t/001-basic.t
+t/002-customize.t
+t/003-rename.t
+t/004-multi-attr.t
+t/lib/MyAttrs.pm

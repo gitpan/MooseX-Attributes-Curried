@@ -1,0 +1,11 @@
+--- 
+abstract: curry your "has"es
+author: 
+  - Shawn M Moore <sartak@bestpractical.com>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: MooseX-Attributes-Curried
+requires: 
+  Moose: 0.01
+  Sub::Exporter: 0.01
+version: 0.01
