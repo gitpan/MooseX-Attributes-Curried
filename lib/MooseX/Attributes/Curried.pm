@@ -1,9 +1,9 @@
 package MooseX::Attributes::Curried;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
-use Sub::Exporter 'setup_exporter';
+use Sub::Exporter build_exporter => { -as => '_build_exporter' };
 
 # taken from Moose.pm, but level has been subtracted by one due to less
 # indirection
@@ -14,24 +14,27 @@ sub _caller_info {
     return \%info;
 }
 
-sub import {
-    shift;
-
+sub build_exporter {
     my %keywords;
 
     while (my ($keyword, $defaults) = splice @_, 0, 2) {
-        ref($defaults) eq 'HASH'
-            or Carp::croak("The defaults for '$keyword' must be a hashref.");
+        ref($defaults) eq 'HASH' || ref($defaults) eq 'CODE'
+            or Carp::croak("The defaults for '$keyword' must be a hashref or a coderef.");
 
         $keywords{$keyword} = sub {
             my ($class, $arg, $opt) = @_;
-            my @customized_defaults = (%$defaults, %$opt);
 
             sub {
                 my $name = shift;
                 my %options = (
                     definition_context => _caller_info(),
-                    @customized_defaults,
+                    %{
+                        ref($defaults) eq 'CODE' ? do {
+                            local $_ = $name;
+                            $defaults->([@_], $opt),
+                        } : $defaults
+                    },
+                    %$opt,
                     @_,
                 );
 
@@ -43,13 +46,22 @@ sub import {
         };
     }
 
-    setup_exporter({
-        into    => scalar(caller),
+    return _build_exporter({
         exports => [%keywords],
         groups  => {
             default => [keys %keywords],
         },
     });
+}
+
+sub import {
+    shift;
+    my $exporter = build_exporter(@_);
+
+    my $caller = caller;
+
+    no strict 'refs';
+    *{ $caller . '::import' } = $exporter;
 }
 
 1;
@@ -62,7 +74,7 @@ MooseX::Attributes::Curried - curry your "has"es
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -106,7 +118,17 @@ further by specifying additional options on your import line, like so:
         has_datetime => {
             is => 'ro',
         },
+        has_datetime => {
+            -as      => 'needs_datetime',
+            required => 1,
+        },
     );
+
+Your "defaults" for the attribute can also be a code reference. This code
+reference will receive both the parameters directly provided for the attribute,
+as well as any additional specializations performed when the curried attribute
+was imported (at which time it can be further curried). This is immensely
+powerful, see F<t/007-smart-has.t> for a taste.
 
 =head1 SEE ALSO
 

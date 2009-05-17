@@ -1,3 +1,4 @@
+Changes
 LICENSE
 MANIFEST
 META.yml
@@ -9,4 +10,9 @@ t/001-basic.t
 t/002-customize.t
 t/003-rename.t
 t/004-multi-attr.t
+t/005-multi-curry.t
+t/006-coderef.t
+t/007-smart-has.t
 t/lib/MyAttrs.pm
+t/lib/MyCodeAttrs.pm
+t/lib/MySmartAttrs.pm

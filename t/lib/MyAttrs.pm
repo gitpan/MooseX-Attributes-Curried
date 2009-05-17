@@ -1,5 +1,5 @@
 package MyAttrs;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use MooseX::Attributes::Curried (
     has_str => {
