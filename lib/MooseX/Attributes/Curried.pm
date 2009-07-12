@@ -1,9 +1,9 @@
 package MooseX::Attributes::Curried;
-our $VERSION = '0.02';
-
 use strict;
 use warnings;
 use Sub::Exporter build_exporter => { -as => '_build_exporter' };
+
+our $VERSION = 0.03;
 
 # taken from Moose.pm, but level has been subtracted by one due to less
 # indirection
@@ -28,14 +28,10 @@ sub build_exporter {
                 my $name = shift;
                 my %options = (
                     definition_context => _caller_info(),
-                    %{
-                        ref($defaults) eq 'CODE' ? do {
-                            local $_ = $name;
-                            $defaults->([@_], $opt),
-                        } : $defaults
-                    },
-                    %$opt,
-                    @_,
+                    (ref($defaults) eq 'CODE' ? do {
+                        local $_ = $name;
+                        %{ $defaults->($opt, [@_]) },
+                    } : (%$defaults, %$opt, @_)),
                 );
 
                 my $attrs = (ref($name) eq 'ARRAY') ? $name : [$name];
@@ -71,10 +67,6 @@ __END__
 =head1 NAME
 
 MooseX::Attributes::Curried - curry your "has"es
-
-=head1 VERSION
-
-version 0.02
 
 =head1 SYNOPSIS
 
@@ -125,14 +117,26 @@ further by specifying additional options on your import line, like so:
     );
 
 Your "defaults" for the attribute can also be a code reference. This code
-reference will receive both the parameters directly provided for the attribute,
-as well as any additional specializations performed when the curried attribute
-was imported (at which time it can be further curried). This is immensely
-powerful, see F<t/007-smart-has.t> for a taste.
+reference will receive both the additional specializations performed when
+the curried attribute was imported, as well as any additional specializations
+used in the individual attribute. This is immensely powerful, see
+F<t/007-smart-has.t> for a taste.
 
 =head1 SEE ALSO
 
 L<MooseX::Attribute::Prototype>, which has very similar goals; this
 extension was originally proposed as an implementation of prototype attributes.
 
+=head1 AUTHOR
+
+Shawn M Moore, C<sartak@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Shawn M Moore.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
 =cut
+

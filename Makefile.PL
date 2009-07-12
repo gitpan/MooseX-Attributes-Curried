@@ -1,19 +1,13 @@
+# Load the Module::Install bundled in ./inc/
+use inc::Module::Install;
 
-use strict;
-use warnings;
+# Define metadata
+name     'MooseX-Attributes-Curried';
+all_from 'lib/MooseX/Attributes/Curried.pm';
+githubmeta;
 
-use ExtUtils::MakeMaker;
+requires 'Moose'         => 0.84;
+requires 'Sub::Exporter' => 0.01;
 
-WriteMakefile(
-  DISTNAME  => 'MooseX-Attributes-Curried',
-  NAME      => 'MooseX::Attributes::Curried',
-  AUTHOR    => 'Shawn\ M\ Moore\ \<sartak\@bestpractical\.com\>',
-  ABSTRACT  => 'curry your "has"es',
-  VERSION   => '0.02',
-  EXE_FILES => [ qw() ],
-  (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
-  PREREQ_PM    => {
-    "Sub::Exporter" => '0.01',
-    "Moose" => '0.74',
-  },
-);
+WriteAll;
+
